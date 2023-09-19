@@ -1,0 +1,73 @@
+db.students.find({}) //students isimli koleksiyondan tüm kayıtları getirir.
+SQL = Structured Query Language(Yapısal Sorgulama Dili)
+NoSQL = Not Only Structured Language(Sadece SQL yok bizde varız eyy RDBMS'ler diyor MongoDB gibi DB'ler)
+
+personel       --->RDBMS YAPIDAKI VERI. YANI SQL DB.
+-------------
+name |age  |
+ali  |20   |
+------------- 
+[             --->MONGODB GIBI DOCUMENT BAZLI DB. personel.json --> dosya şeklinde tutulur.
+	{
+		name: 'ali',
+		age: 20
+	},
+	{
+		name: 'veli',
+		age: 99
+	},
+]
+
+show dbs --> kaç tane veritabanı var onu verir.
+use admin --> admin veritabanını kullanır. switch eder. 
+use hospital --> hastane veritabanına switch eder.
+db.createCollection("doctors") --> doctors adında yeni bir tablo oluşturur.
+db.dropDatabase() --> o an hangi veritabanını kullanıyorsak onu drop eder.
+db.doctors.insertOne({name: "Mutlu", age: 35, gpa: 3.2}) --> bir satırlık veri girer.
+db.doctors.find({})
+db.doctors.insertMany([{name: "Hüseyin", age: 29, gpa: 1.5}, {name: "Selami", age: 88, gpa: 1.10}, {name: "Ahmet", age: 18, gpa:2.5}]) --> çoklu kayıt girer. [] ifadesinin içine kaç adet obje girilirse o kadar kayıt girilir.
+db.doctors.find() --> tüm kayıtları okur.
+db.doctors.insertOne({name: "Hasan", age: 90, fullTime: false, regiterDate: new Date(), gradutionDate: null, courses: ["Java", "Spring", "JavaEE"], address: {street: "123 fake st.", city: "Bikini Bottom", zip: 12345}}) --> bir satırlık veri girer. Date formatında, null ve dizi şeklinde fieldler olabilir.
+db.doctors.find({}) //tüm kayıtları listeler.
+db.doctors.find().sort({name -1}) //tüm kayıtları bulup listeler. name kolonuna göre -1 olunca azalan sırada sıralar. +1 olunca yani 1 olunca artan sırada sıralar.
+db.doctors.find().sort({gpa:1}) //gpa kolonuna göre artan sırada sıralar.
+db.doctors.find().limit(1) //tüm kayıtların içerisinden ilk kaydı getirir.
+db.doctors.find().limit(3) //tüm kayıtların içerisinden ilk 3 kaydı getirir.
+db.doctors.find().sort({gpa:-1}).limit(1) //gpa kolonuna(field) göre azalan sırada sıralar ve ilk kaydı alır.
+db.doctors.find({name: "Hasan"}) //adı hasan olan objeyi(kaydı) bulur.
+db.students.find({fullTime: false}) //fullTime kolonu false olanları bulur.
+db.doctors.find({}, {name: true}) //tüm kayıtları bulur. 2. girdiğimiz where şartı değil sadece name fieldlerini(kolonlarını) ekrana basmamıza yarar.
+db.doctors.find({}, {_id: false, name: true}) //id'i yansıtma sadece name'i yansıt.
+db.doctors.updateOne({name: "Hasan"}, {$set: {fullTime: true}}) //adı hasan olan kayıtların fullTime field'ini true olarak set et dedik.
+db.doctors.find({name: "Hasan"}) //hasan olan kaydı bul bakalım.
+db.doctors.updateOne({_id: Object("ilgili id gelecek buraya")}, {$set: {fullTime: false}}) //ilgili id'li kaydı bul. o kaydın fullTime field'ini false olarak set et.
+db.doctors.updateOne({_id: Object("ID hash")}, {$unset:{fullTime:""}}) //ilgili id'li kaydı bulur onun fullTime isimli kolonunu set edilmeden önceki haline çevirir.
+db.doctors.updateOne({_id: Object("ID hash")}) //ilgili id'li kaydı bulur.
+db.doctors.updateMany({}, {$set:{fullTime: false}}) //tüm kayıtların fullTime kolonunu set edilmeden önceki haline çevirir.
+db.doctors.updateMany({fullTime:{$exists: false}}, {$set: {fullTime: true}}) //çok emin değilim.
+db.doctors.deleteOne({name: "Hüsnü"}) //adı hüsnü olan ilk kaydı siler.
+db.doctors.deleteMany({fullTime: false}) //fullTime kolonu false olan tüm kayıtları siler. many çoklu/çok demektir.
+db.doctors.deleteMany({registerDate: {$exists: false}}) //tam emin değilim.
+db.doctors.find({name: {$ne: "Huseyin"}}) //adı Huseyin olmayanları bulur. n=not, e=equal.
+db.doctors.find({age: {$lt: 20}}) //yaşı 20'nin altında olanları bulur getirir.
+db.doctors.find({age: {$lte: 27}}) //yaşı 27'ye eşit yahut altında olan kayıtları getirir.
+db.doctors.find({age: {$gt: 27}}) //yaşı 27'nin altında olan kayıtları getirir.
+db.doctos.find({gpa: {$gte:3, $lte: 4}}) //gpa kolonu 3 ila 4 arasında olan kayıtları getirir.
+db.doctors.find({name: {$in["Hasan", "Hüsamettin", "Hüseyin", "Hüsnü", "Hüsrev"]}}) //in içinde geçenleri getirir. name kolonun içinde "Hasan", "Hüsamettin", "Hüseyin", "Hüsnü", "Hüsrev" geçenleri getirir.
+db.doctors.find({name: {$nin["Hasan", "Hüsamettin", "Hüseyin", "Hüsnü", "Hüsrev"]}}) //nin içinde geçmeyenler getirir. name kolonun içinde "Hasan", "Hüsamettin", "Hüseyin", "Hüsnü", "Hüsrev" geçmeyenleri getirir.
+db.doctors.find({$and: [{fullTime: true}, {age: {$lte: 22}}]}) //yaşı 22 veya altı olan ve fullTime'ı true olan kayıtları getirir. şart sağlanmazsa asla kayıt dönmez.
+db.doctors.find({$or: [{fullTime: true}, {age: {$lte: 22}}]}) //(yaşı 22 veya altı olan) veya (fullTime'ı true olan) kayıtları getirir. iki şarttan birisi sağlanırsa kayıt döner. iki şarttan ikiside sağlanırsa kayıt döner. ikiside sağlanmazsa asla kayıt dönmez.
+db.doctors.find({$nor: [{fullTime: true}, {age: {$lte: 22}}]}) //fullTime kolonu false veya age kolonu 22'den buyuk olan kayıtları getirir. n=not, or=veya. şartları tersine çevirir n=not.
+db.doctors.find({age: {$not{$lt: 30}}}) //yası 30'dan küçük olmayan kayıtları getirir. $not durumu tersine çevirir.
+db.doctors.find({name: "Hasan"}).explain("executionStats") //çalıştırdığımız sorgu ve mongodb sunucusu hakkında bir takım bilgiler veriyor.
+db.doctors.createIndex({name: 1}) //name kolonuna göre fiziksel sıralamalı index oluşturuyor. fiziksel sıralamayı artan sırada yapıyor.
+Indexler büyük verilerde arama işlemlerinde kullanılır. Amaç aranan veriye çabuk ulaşabilmektir.
+MongoDB B-Tree/Binary Tree algoritmasını kullanıyor. Bu algoritma kayıtları 2'ye bölerek arıyor ve eleye eleye gittiği için çok hızlı bir şekilde buluyor. Diğer türlü tüm kayıtları tek tek tarayacaktı o da çoook zaman alacaktı büyük verilerde. Bu ciddi performans kaybı demektir. Çok kayıt girilen, güncellenen ve silinen tablolarda(documents) index kullanımı önerilmez. Böyle durumlar index yapısı bozulur.
+db.doctors.getIndexes() //doctors dökümanı üzerindeki tüm indexleri getirir.
+db.doctors.dropIndex("name_1") //name_1 isimli index'i drop eder. düşürür, siler.
+show collections //koleksiyonları listeler.
+db.createCollection("teacher", {capped:true, size=10000000, max=100}, {autoIndexId:true}) //öğrenmen diye koleksiyon oluşturur. max size'ı 10 mb olur. oluşturma esnasında ID kolonu otomatik olarak index olur.
+db.createCollection("nurses") //hemşiler koleksiyonu oluşturur.
+show collections //tüm koleksiyonları oluşturur.
+db.nurses.drop() //hemşireler adlı koleksiyonu siler.
+show collections
